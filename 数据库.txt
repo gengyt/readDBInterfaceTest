@@ -1,0 +1,20 @@
+先创建一个test_team数据库，在该库中创建一下两个表
+
+CREATE TABLE `api` (
+  `api_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(300) DEFAULT NULL COMMENT '接口注释',
+  `url` varchar(500) NOT NULL,
+  `method` varchar(5) NOT NULL COMMENT 'post/get',
+  `is_json` varchar(2) NOT NULL COMMENT '参数是否为json格式',
+  PRIMARY KEY (`api_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='接口信息表';
+
+
+CREATE TABLE `api` (
+  `api_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(300) DEFAULT NULL COMMENT '接口注释',
+  `url` varchar(500) NOT NULL,
+  `method` varchar(5) NOT NULL COMMENT 'post/get',
+  `is_json` varchar(2) NOT NULL COMMENT '参数是否为json格式',
+  PRIMARY KEY (`api_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='接口信息表';
