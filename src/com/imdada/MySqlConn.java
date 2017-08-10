@@ -1,6 +1,5 @@
 package com.imdada;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,10 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MySqlConn {
+
 	public Statement sqlConn() {
 		Connection conn;
 		String driver = "com.mysql.jdbc.Driver";
-		String url = "jdbc:mysql://192.168.1.250:3307/test_team";
+		String url = "jdbc:mysql://192.168.1.250:3307?characterEncoding=utf8&useSSL=false";
 		String user = "dev_w";
 		String password = "6nvjq0_HW";
 		Statement statement = null;
@@ -37,7 +37,7 @@ public class MySqlConn {
 		List<Api> listApi = new ArrayList<Api>();
 		Statement stat = sqlConn();
 		// 查询所有要执行的接口
-		String sql = "select api_id,url,method,is_json from api;";
+		String sql = "select api_id,url,method,is_json from test_team.api;";
 		ResultSet rs = null;
 		try {
 			rs = stat.executeQuery(sql);
@@ -49,13 +49,11 @@ public class MySqlConn {
 				api.setIsJson(rs.getString("is_json"));
 				listApi.add(api);
 			}
+
+			rs.close();
+			stat.close();
 		} catch (SQLException e) {
-			try {
-				rs.close();
-				stat.close();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		return listApi;
@@ -70,51 +68,118 @@ public class MySqlConn {
 		List<ApiCase> listApiCase = new ArrayList<ApiCase>();
 		Statement stat = sqlConn();
 		// 查询所有要执行的接口
-		String sql = "select ap.case_id,ap.params,ap.expected,ap.result,ap.is_run from api,api_params ap "
+		String sql = "select ap.name,ap.case_id,ap.params,ap.expected,ap.result,ap.is_run,ap.next_case_params from test_team.api,test_team.api_params ap "
 				+ "where api.api_id = ap.api_id  and ap.is_run = 'Y' and ap.api_id='" + apiId + "';";
 		ResultSet rs = null;
 		try {
 			rs = stat.executeQuery(sql);
-			while(rs.next()) {
+			while (rs.next()) {
 				ApiCase apiCase = new ApiCase();
+				apiCase.setName(rs.getString("name"));
 				apiCase.setCaseId(rs.getString("case_id"));
 				apiCase.setParams(rs.getString("params"));
 				apiCase.setExpected(rs.getString("expected"));
 				apiCase.setIsRun(rs.getString("is_run"));
+				apiCase.setNextCaseParams(rs.getString("next_case_params"));
+				
 				listApiCase.add(apiCase);
 			}
+
+			rs.close();
+			stat.close();
 		} catch (SQLException e) {
-			try {
-				rs.close();
-				stat.close();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		return listApiCase;
 	}
 
 	/**
-	 * 更新执行结果
+	 * 更新结果
 	 * 
 	 * @param result
 	 * @param caseId
 	 */
 	public void updateCaseResult(String result, String caseId) {
 		Statement stat = sqlConn();
-		// 查询所有要执行的接口
-		String sql = "update api_params set result='" + result + "' where case_id = " + caseId + ";";
+		String sql = "update test_team.api_params set result='" + result + "' where case_id = " + caseId + ";";
 		try {
 			stat.executeUpdate(sql);
+
+			stat.close();
 		} catch (SQLException e) {
-			try {
-				stat.close();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-
 	}
+
+	/**
+	 * 更新实际值与期待值不符的case
+	 * 
+	 * @param result
+	 * @param caseId
+	 */
+	public void updateErrorCase(String edr, String caseId) {
+		Statement stat = sqlConn();
+		String sql = "update test_team.api_params set expected_diff_result='" + edr + "' where case_id = " + caseId
+				+ ";";
+		try {
+			stat.executeUpdate(sql);
+
+			stat.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 清空要所有要执行的测试case的result、expected_diff_result
+	 * 
+	 */
+	public void clear(String apiId) {
+		Statement stat = sqlConn();
+		String sqlUpdate = "update test_team.api_params set result='',expected_diff_result='' where api_id = '" + apiId
+				+ "' and is_run in ('Y','y');";
+		try {
+			// 先更新result、expected_diff_result为空
+			stat.executeUpdate(sqlUpdate);
+
+			stat.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 查询DB
+	 * 
+	 * @return
+	 */
+	// public List<ApiCase> inExceptedSql(String sql) {
+	// List<ApiCase> listApiCase = new ArrayList<ApiCase>();
+	// Statement stat = sqlConn();
+	// ResultSet rs = null;
+	// try {
+	// rs = stat.executeQuery(sql);
+	// while(rs.next()) {
+	// ApiCase apiCase = new ApiCase();
+	// apiCase.setCaseId(rs.getString("case_id"));
+	// apiCase.setParams(rs.getString("params"));
+	// apiCase.setExpected(rs.getString("expected"));
+	// apiCase.setIsRun(rs.getString("is_run"));
+	// listApiCase.add(apiCase);
+	// }
+	// } catch (SQLException e) {
+	// try {
+	// rs.close();
+	// stat.close();
+	// } catch (SQLException e1) {
+	// e1.printStackTrace();
+	// }
+	// e.printStackTrace();
+	// }
+	// return listApiCase;
+	// }
 }

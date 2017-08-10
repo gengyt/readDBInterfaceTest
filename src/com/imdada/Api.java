@@ -1,6 +1,5 @@
 package com.imdada;
 
-
 public class Api {
 
 	String apiId;

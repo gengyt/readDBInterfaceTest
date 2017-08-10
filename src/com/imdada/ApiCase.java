@@ -3,11 +3,29 @@ package com.imdada;
 
 public class ApiCase {
 
+	String name;
 	String caseId;
 	String expected;
 	String result;
 	String isRun;
 	String params;
+	String nextCaseParams;
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getNextCaseParams() {
+		return nextCaseParams;
+	}
+
+	public void setNextCaseParams(String nextCaseParams) {
+		this.nextCaseParams = nextCaseParams;
+	}
 
 	public String getParams() {
 		return params;
